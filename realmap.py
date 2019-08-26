@@ -1,5 +1,7 @@
-import shapefile
+import cv2
 from dataclasses import dataclass
+import numpy as np
+import shapefile
 
 @dataclass
 class Cell:
@@ -11,8 +13,8 @@ class Cell:
 # parameters
 out_min_x = 0
 out_min_y = 0
-out_max_x = 40
-out_max_y = 20
+out_max_x = 96
+out_max_y = 60
 
 out_size_x = out_max_x - out_min_x
 out_size_y = out_max_y - out_min_y
@@ -122,3 +124,76 @@ for p in f_waterways:
 
     out_map[x][y].waterway = True
 
+
+# Read tileset and store tiles we want to keep
+tileset = cv2.imread("example/tileset/terrain.bmp", cv2.IMREAD_COLOR)
+tileset_b = cv2.imread("example/tileset/building.bmp", cv2.IMREAD_COLOR)
+
+
+def getTile(x, y):
+    return tileset[y*16:y*16+16, x*16:x*16+16]
+
+
+def getTileB(x, y):
+    return tileset_b[y*16:y*16+16, x*16:x*16+16]
+
+
+tile_nature = getTile(0, 0)
+tile_road_horizontal = getTile(1, 0)
+tile_road_bridge_horizontal = getTile(2, 0)
+tile_water_horizontal = getTile(3, 0)
+
+tile_road_vertical = getTile(1, 1)
+tile_road_bridge_vertical = getTile(2, 1)
+tile_water_vertical = getTile(3, 1)
+
+tile_water = getTile(0, 2)
+tile_road_cross = getTile(1, 2)
+tile_water_cross = getTile(3, 2)
+
+tile_building = getTileB(2, 1)
+
+out_image = np.zeros((out_size_y*16,out_size_x*16,3), np.uint8)
+
+for x in range(0, out_size_x):
+    for y in range(0, out_size_y):
+
+        # To the more specific to the less specific.
+
+        # bridges
+        if out_map[x][y].waterway and out_map[x][y].road:
+            if out_map[x-1][y].road and out_map[x][y-1].road and out_map[x+1][y].road and out_map[x][y+1].road:
+                tile = tile_road_cross
+            elif out_map[x-1][y].road and out_map[x+1][y].road:
+                tile = tile_road_bridge_horizontal
+            elif out_map[x][y-1].road and out_map[x][y+1].road:
+                tile = tile_road_bridge_vertical
+            else:
+                tile = tile_road_cross
+        # waterways
+        elif out_map[x][y].waterway:
+            tile = tile_water
+        # roads
+        elif out_map[x][y].road:
+            if out_map[x - 1][y].road and out_map[x][y - 1].road and out_map[x + 1][y].road and out_map[x][y + 1].road:
+                tile = tile_road_cross
+            elif out_map[x-1][y].road and out_map[x+1][y].road:
+                tile = tile_road_horizontal
+            elif out_map[x][y-1].road and out_map[x][y+1].road:
+                tile = tile_road_vertical
+            else:
+                tile = tile_road_cross
+
+        elif out_map[x][y].building:
+            tile = tile_building
+        else:
+            tile = tile_nature
+
+        y_ = out_size_y - y - 1
+        out_image[y_ * 16:y_ * 16 + 16, x * 16:x * 16 + 16] = tile
+
+
+# cv2.imshow('Image', out_image)
+# k = cv2.waitKey(0)
+
+cv2.imwrite("example/result.png", out_image)
