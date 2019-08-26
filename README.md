@@ -3,8 +3,14 @@ Create video game map using real data from OpenStreetMap
 
 
 ## Results
-No result yet !
+### Initial exctracted Shapefile
+![Initial exctracted Shapefile](example/initial.png)
 
+### Pre-processed Shapefile
+![Pre-processed Shapefile](example/preprocessed.png)
+
+### Result
+![Result](example/result.png)
 
 ## How it works
 To create a Map, we separate the real world into cells. Each cell contain a flag for every type of element which exists
