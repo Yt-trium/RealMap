@@ -1,4 +1,12 @@
 import shapefile
+from dataclasses import dataclass
+
+@dataclass
+class Cell:
+    building: bool = False
+    railway: bool = False
+    road: bool = False
+    waterway: bool = False
 
 # parameters
 out_min_x = 0
@@ -11,7 +19,7 @@ out_size_y = out_max_y - out_min_y
 out_r = out_size_x / out_size_y
 out_bbox = (out_min_x, out_min_y, out_max_x, out_max_y)
 
-out_map = [[0 for y in range(0, out_size_y+1)] for x in range(0, out_size_x+1)]
+out_map = [[Cell() for y in range(0, out_size_y+1)] for x in range(0, out_size_x+1)]
 
 print("RealMap")
 
@@ -88,9 +96,7 @@ for p in s_buildings:
 
     x, y = getCellCoord(x, y)
 
-    print(x,y)
-
-    out_map[x][y] = out_map[x][y] | int("00000001", 2)
+    out_map[x][y].building = True
 
 for p in f_railways:
     x = p.points[0][0]
@@ -98,7 +104,7 @@ for p in f_railways:
 
     x, y = getCellCoord(x, y)
 
-    out_map[x][y] = out_map[x][y] | int("00000010", 2)
+    out_map[x][y].railway = True
 
 for p in f_roads:
     x = p.points[0][0]
@@ -106,7 +112,7 @@ for p in f_roads:
 
     x, y = getCellCoord(x, y)
 
-    out_map[x][y] = out_map[x][y] | int("00000100", 2)
+    out_map[x][y].road = True
 
 for p in f_waterways:
     x = p.points[0][0]
@@ -114,5 +120,5 @@ for p in f_waterways:
 
     x, y = getCellCoord(x, y)
 
-    out_map[x][y] = out_map[x][y] | int("00001000", 2)
+    out_map[x][y].waterway = True
 
