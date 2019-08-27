@@ -263,13 +263,13 @@ for x in range(0, out_size_x):
                 tile = tile_rail_horizontal
             elif out_map[x][y-1].railway and out_map[x][y+1].railway:
                 tile = tile_rail_vertical
-            elif out_map[x+1][y]:
+            elif out_map[x+1][y] and not out_map[x-1][y]:
                 tile = tile_rail_horizontal_right_end
-            elif out_map[x-1][y]:
+            elif out_map[x-1][y] and not out_map[x+1][y]:
                 tile = tile_rail_horizontal_left_end
-            elif out_map[x][y+1]:
+            elif out_map[x][y+1] and not out_map[x][y-1]:
                 tile = tile_rail_vertical_up_end
-            elif out_map[x][y-1]:
+            elif out_map[x][y-1] and not out_map[x][y+1]:
                 tile = tile_rail_vertical_down_end
             else:
                 tile = tile_nature_forest
