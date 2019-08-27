@@ -3,9 +3,6 @@ Create video game map using real data from OpenStreetMap
 
 ## Todo
 * Add a 4-to-8-connectivity algorithm for railways, roads and waterways
-* Use turn tiles for roads
-* Use railways tiles
-* Use different type of buildings tiles
 * Create a GUI for real time map creation and edition
 
 ## Results
