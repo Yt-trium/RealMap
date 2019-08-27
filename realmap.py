@@ -142,14 +142,39 @@ tile_nature = getTile(0, 0)
 tile_road_horizontal = getTile(1, 0)
 tile_road_bridge_horizontal = getTile(2, 0)
 tile_water_horizontal = getTile(3, 0)
+tile_rail_horizontal = getTile(16, 0)
+tile_rail_down_right = getTile(17, 0)
 
 tile_road_vertical = getTile(1, 1)
 tile_road_bridge_vertical = getTile(2, 1)
 tile_water_vertical = getTile(3, 1)
+tile_rail_vertical = getTile(16, 1)
+tile_rail_down_left = getTile(17, 1)
 
 tile_water = getTile(0, 2)
 tile_road_cross = getTile(1, 2)
 tile_water_cross = getTile(3, 2)
+tile_rail_horizontal_left_end = getTile(16, 2)
+tile_rail_up_right = getTile(17, 2)
+
+tile_nature_forest = getTile(0, 3)
+tile_rail_horizontal_right_end = getTile(16, 3)
+tile_rail_up_left = getTile(17, 3)
+
+tile_road_down_right = getTile(1, 4)
+tile_road_down_left = getTile(2, 4)
+tile_rail_vertical_up_end = getTile(16, 4)
+
+tile_road_up_down_right = getTile(1, 5)
+tile_road_up_down_left = getTile(2, 5)
+tile_rail_vertical_down_end = getTile(16, 5)
+
+tile_road_down_left_right = getTile(1, 6)
+tile_road_up_left_right = getTile(2, 6)
+
+tile_road_up_right = getTile(1, 7)
+tile_road_up_left = getTile(2, 7)
+
 
 tile_tower_1 = getTileB(0, 0)
 tile_tower_2 = getTileB(0, 1)
@@ -192,12 +217,62 @@ for x in range(0, out_size_x):
         elif out_map[x][y].road:
             if out_map[x - 1][y].road and out_map[x][y - 1].road and out_map[x + 1][y].road and out_map[x][y + 1].road:
                 tile = tile_road_cross
+            elif out_map[x-1][y].road and out_map[x+1][y].road and out_map[x][y+1].road:
+                tile = tile_road_up_left_right
+            elif out_map[x-1][y].road and out_map[x+1][y].road and out_map[x][y-1].road:
+                tile = tile_road_down_left_right
+            elif out_map[x+1][y].road and out_map[x][y+1].road and out_map[x][y-1].road:
+                tile = tile_road_up_down_right
+            elif out_map[x-1][y].road and out_map[x][y+1].road and out_map[x][y-1].road:
+                tile = tile_road_up_down_left
+            elif out_map[x+1][y].road and out_map[x][y+1].road:
+                tile = tile_road_up_right
+            elif out_map[x+1][y].road and out_map[x][y-1].road:
+                tile = tile_road_down_right
+            elif out_map[x-1][y].road and out_map[x][y+1].road:
+                tile = tile_road_up_left
+            elif out_map[x-1][y].road and out_map[x][y-1].road:
+                tile = tile_road_down_left
             elif out_map[x-1][y].road and out_map[x+1][y].road:
                 tile = tile_road_horizontal
             elif out_map[x][y-1].road and out_map[x][y+1].road:
                 tile = tile_road_vertical
             else:
                 tile = tile_road_cross
+        # railways
+        elif out_map[x][y].railway:
+            if out_map[x - 1][y].railway and out_map[x][y - 1].railway and out_map[x + 1][y].railway and out_map[x][y + 1].railway:
+                tile = tile_nature_forest
+            elif out_map[x-1][y].railway and out_map[x+1][y].railway and out_map[x][y+1].railway:
+                tile = tile_nature_forest
+            elif out_map[x-1][y].railway and out_map[x+1][y].railway and out_map[x][y-1].railway:
+                tile = tile_nature_forest
+            elif out_map[x+1][y].railway and out_map[x][y+1].railway and out_map[x][y-1].railway:
+                tile = tile_nature_forest
+            elif out_map[x-1][y].railway and out_map[x][y+1].railway and out_map[x][y-1].railway:
+                tile = tile_nature_forest
+            elif out_map[x+1][y].railway and out_map[x][y+1].railway:
+                tile = tile_rail_up_right
+            elif out_map[x+1][y].railway and out_map[x][y-1].railway:
+                tile = tile_rail_down_right
+            elif out_map[x-1][y].railway and out_map[x][y+1].railway:
+                tile = tile_rail_up_left
+            elif out_map[x-1][y].railway and out_map[x][y-1].railway:
+                tile = tile_rail_down_left
+            elif out_map[x-1][y].railway and out_map[x+1][y].railway:
+                tile = tile_rail_horizontal
+            elif out_map[x][y-1].railway and out_map[x][y+1].railway:
+                tile = tile_rail_vertical
+            elif out_map[x+1][y]:
+                tile = tile_rail_horizontal_right_end
+            elif out_map[x-1][y]:
+                tile = tile_rail_horizontal_left_end
+            elif out_map[x][y+1]:
+                tile = tile_rail_vertical_up_end
+            elif out_map[x][y-1]:
+                tile = tile_rail_vertical_down_end
+            else:
+                tile = tile_nature_forest
         # buildings
         elif out_map[x][y].building:
             if x < 2 or x > out_size_x - 2 or y < 2 or y > out_size_y - 2:
