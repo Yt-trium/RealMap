@@ -125,7 +125,7 @@ for p in f_waterways:
     out_map[x][y].waterway = True
 
 
-# Read tileset and store tiles we want to keep
+# Read tileset and store tiles we want to keep. This section completely depend on the tileset we use.
 tileset = cv2.imread("example/tileset/terrain.bmp", cv2.IMREAD_COLOR)
 tileset_b = cv2.imread("example/tileset/building.bmp", cv2.IMREAD_COLOR)
 
@@ -151,12 +151,27 @@ tile_water = getTile(0, 2)
 tile_road_cross = getTile(1, 2)
 tile_water_cross = getTile(3, 2)
 
-tile_building = getTileB(2, 1)
+tile_tower_1 = getTileB(0, 0)
+tile_tower_2 = getTileB(0, 1)
+tile_city_1 = getTileB(1, 0)
+tile_city_2 = getTileB(1, 1)
+tile_factory = getTileB(2, 1)
+tile_alarm_1 = getTileB(5, 0)
+tile_alarm_2 = getTileB(5, 1)
 
 out_image = np.zeros((out_size_y*16,out_size_x*16,3), np.uint8)
 
+
+def applyPartialTile(out_image, x, y, partialTile):
+    for i in range(16):
+        for j in range(16):
+            if not (partialTile[i][j][0] == 0 and partialTile[i][j][1] == 0 and partialTile[i][j][2] == 0):
+                out_image[y * 16 + i][x* 16 + j] = partialTile[i][j]
+    return out_image
+
+
 for x in range(0, out_size_x):
-    for y in range(0, out_size_y):
+    for y in range(out_size_y-1, 0, -1):
 
         # To the more specific to the less specific.
 
@@ -183,9 +198,30 @@ for x in range(0, out_size_x):
                 tile = tile_road_vertical
             else:
                 tile = tile_road_cross
-
+        # buildings
         elif out_map[x][y].building:
-            tile = tile_building
+            if x < 2 or x > out_size_x - 2 or y < 2 or y > out_size_y - 2:
+                tile = tile_factory
+            else:
+                if (out_map[x - 1][y].building and out_map[x - 2][y].building
+                and out_map[x + 1][y].building and out_map[x + 2][y].building
+                and out_map[x][y - 1].building and out_map[x][y - 2].building
+                and out_map[x][y + 1].building and out_map[x][y + 2].building):
+                    tile = tile_tower_2
+                    y_ = out_size_y - y - 2
+                    out_image = applyPartialTile(out_image, x, y_, tile_tower_1)
+                elif (out_map[x - 1][y].building and out_map[x + 1][y].building
+                and out_map[x][y - 1].building and out_map[x][y + 1].building):
+                    tile = tile_city_2
+                    y_ = out_size_y - y - 2
+                    out_image = applyPartialTile(out_image, x, y_, tile_city_1)
+                elif (not out_map[x - 1][y].building and not out_map[x + 1][y].building
+                  and not out_map[x][y - 1].building and not out_map[x][y + 1].building):
+                    tile = tile_alarm_2
+                    y_ = out_size_y - y - 2
+                    out_image = applyPartialTile(out_image, x, y_, tile_alarm_1)
+                else:
+                    tile = tile_factory
         else:
             tile = tile_nature
 
@@ -193,7 +229,7 @@ for x in range(0, out_size_x):
         out_image[y_ * 16:y_ * 16 + 16, x * 16:x * 16 + 16] = tile
 
 
-# cv2.imshow('Image', out_image)
-# k = cv2.waitKey(0)
+cv2.imshow('Image', out_image)
+k = cv2.waitKey(0)
 
 cv2.imwrite("example/result.png", out_image)
